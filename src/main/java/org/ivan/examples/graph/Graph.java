@@ -11,18 +11,18 @@ import java.util.Optional;
 import java.util.Set;
 
 // t0d0 generalize vertex type
+// t0d0 undirected graph support
 public class Graph {
     public interface Edge {
         Vertex from();
         Vertex to();
     }
 
-    // t0d0 undirected graph support
-    private static class DirectedEdge implements Edge {
+    private static class EdgeImpl implements Edge {
         private final Vertex from;
         private final Vertex to;
 
-        private DirectedEdge(Vertex from, Vertex to) {
+        private EdgeImpl(Vertex from, Vertex to) {
             this.from = Objects.requireNonNull(from);
             this.to = Objects.requireNonNull(to);
         }
@@ -41,7 +41,7 @@ public class Graph {
                 return true;
             if (o == null || getClass() != o.getClass())
                 return false;
-            DirectedEdge edge = (DirectedEdge)o;
+            EdgeImpl edge = (EdgeImpl)o;
             return Objects.equals(from, edge.from) &&
                 Objects.equals(to, edge.to);
         }
@@ -110,13 +110,12 @@ public class Graph {
 
         Set<Vertex> adjs = adjacencyMap.get(from);
         if (adjs.contains(to)) {
-            path.addLast(new DirectedEdge(from, to));
+            path.addLast(new EdgeImpl(from, to));
             return true;
         }
         // advance further
         for (Vertex v : adjs) {
-            // t0d0 consider some special edge type which will be returned to user
-            path.addLast(new DirectedEdge(from, v));
+            path.addLast(new EdgeImpl(from, v));
             if (!visitedVertices.contains(v) && advancePath(v, to, path, visitedVertices)) {
                 return true;
             }
