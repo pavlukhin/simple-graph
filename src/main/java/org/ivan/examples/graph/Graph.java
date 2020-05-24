@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 
 // t0d0 generalize vertex type
-// t0d0 undirected graph support
 public class Graph {
     public interface Edge {
         Vertex from();
@@ -52,8 +51,21 @@ public class Graph {
         }
     }
 
+    private final boolean isDirected;
     private final Map<Vertex, Set<Vertex>> adjacencyMap = new HashMap<>();
     private final Set<Vertex> vertices = adjacencyMap.keySet();
+
+    public static Graph newDirectedGraph() {
+        return new Graph(true);
+    }
+
+    public static Graph newUndirectedGraph() {
+        return new Graph(false);
+    }
+
+    private Graph(boolean isDirected) {
+        this.isDirected = isDirected;
+    }
 
     public void addVertex(Vertex v) {
         Objects.requireNonNull(v);
@@ -79,6 +91,9 @@ public class Graph {
         Set<Vertex> adjs = adjacencyMap.get(v1);
         if (!adjs.add(v2)) {
             throw new IllegalArgumentException("Edge is already in graph: " + v1 + " -> " + v2);
+        }
+        if (!isDirected) {
+            adjacencyMap.get(v2).add(v1);
         }
     }
 
