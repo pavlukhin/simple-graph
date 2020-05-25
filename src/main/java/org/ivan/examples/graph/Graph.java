@@ -70,8 +70,7 @@ public class Graph<V> {
     public void addVertex(V v) {
         Objects.requireNonNull(v);
         if (vertices.contains(v)) {
-            // t0d0 proof-read exception messages
-            throw new IllegalArgumentException("Vertex is already in graph: " + v);
+            throw new IllegalArgumentException("A vertex is already in the graph: " + v);
         }
         adjacencyMap.put(v, new HashSet<>());
     }
@@ -80,17 +79,17 @@ public class Graph<V> {
         Objects.requireNonNull(v1);
         Objects.requireNonNull(v2);
         if (v1.equals(v2)) {
-            throw new IllegalArgumentException("Identity edges are not permitted: " + v1 + " to " + v2);
+            throw new IllegalArgumentException("Identity edges are not permitted: " + v1 + " -> " + v2);
         }
         if (!vertices.contains(v1)) {
-            throw new IllegalArgumentException("One of edge vertices does not belong to graph: " + v1);
+            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + v1);
         }
         if (!vertices.contains(v2)) {
-            throw new IllegalArgumentException("One of edge vertices does not belong to graph: " + v2);
+            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + v2);
         }
         Set<V> adjs = adjacencyMap.get(v1);
         if (!adjs.add(v2)) {
-            throw new IllegalArgumentException("Edge is already in graph: " + v1 + " -> " + v2);
+            throw new IllegalArgumentException("An edge is already in the graph: " + v1 + " -> " + v2);
         }
         if (!isDirected) {
             adjacencyMap.get(v2).add(v1);
@@ -102,10 +101,10 @@ public class Graph<V> {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
         if (!vertices.contains(from)) {
-            throw new IllegalArgumentException("Vertex does not belong to graph: " + from);
+            throw new IllegalArgumentException("A vertex does not belong to the graph: " + from);
         }
         if (!vertices.contains(to)) {
-            throw new IllegalArgumentException("Vertex does not belong to graph: " + to);
+            throw new IllegalArgumentException("A vertex does not belong to the graph: " + to);
         }
 
         if (from.equals(to)) {
