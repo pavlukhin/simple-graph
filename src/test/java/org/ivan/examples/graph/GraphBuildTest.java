@@ -7,14 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class GraphBuildTest {
     @Test
     void addNullVertex() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
 
         assertThrows(NullPointerException.class, () -> g.addVertex(null));
     }
 
     @Test
     void addSameVertexTwice() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
@@ -23,21 +23,21 @@ class GraphBuildTest {
 
     @Test
     void addNullVertexEdge() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         assertThrows(NullPointerException.class, () -> g.addEdge(null, new Vertex()));
         assertThrows(NullPointerException.class, () -> g.addEdge(new Vertex(), null));
     }
 
     @Test
     void addNoVertexEdge() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
 
         assertThrows(IllegalArgumentException.class, () -> g.addEdge(new Vertex(), new Vertex()));
     }
 
     @Test
     void addNoSourceVertexEdge() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
@@ -46,7 +46,7 @@ class GraphBuildTest {
 
     @Test
     void addNoTargetVertexEdge() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
@@ -55,7 +55,7 @@ class GraphBuildTest {
 
     @Test
     void addIdentityEdge() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
@@ -64,7 +64,7 @@ class GraphBuildTest {
 
     @Test
     void addSameEdgeTwice() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);
@@ -76,7 +76,7 @@ class GraphBuildTest {
 
     @Test
     void addInverseEdgesToDirectedGraph() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);
@@ -89,7 +89,7 @@ class GraphBuildTest {
 
     @Test
     void addInverseEdgesToUndirectedGraph() {
-        Graph g = Graph.newUndirectedGraph();
+        Graph<Vertex> g = Graph.newUndirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);

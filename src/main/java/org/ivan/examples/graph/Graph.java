@@ -10,27 +10,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-// t0d0 generalize vertex type
-public class Graph {
-    public interface Edge {
-        Vertex from();
-        Vertex to();
+public class Graph<V> {
+    public interface Edge<V> {
+        V from();
+        V to();
     }
 
-    private static class EdgeImpl implements Edge {
-        private final Vertex from;
-        private final Vertex to;
+    private static class EdgeImpl<V> implements Edge<V> {
+        private final V from;
+        private final V to;
 
-        private EdgeImpl(Vertex from, Vertex to) {
+        private EdgeImpl(V from, V to) {
             this.from = Objects.requireNonNull(from);
             this.to = Objects.requireNonNull(to);
         }
 
-        @Override public Vertex from() {
+        @Override public V from() {
             return from;
         }
 
-        @Override public Vertex to() {
+        @Override public V to() {
             return to;
         }
 
@@ -40,6 +39,7 @@ public class Graph {
                 return true;
             if (o == null || getClass() != o.getClass())
                 return false;
+            @SuppressWarnings("rawtypes")
             EdgeImpl edge = (EdgeImpl)o;
             return Objects.equals(from, edge.from) &&
                 Objects.equals(to, edge.to);
@@ -52,22 +52,22 @@ public class Graph {
     }
 
     private final boolean isDirected;
-    private final Map<Vertex, Set<Vertex>> adjacencyMap = new HashMap<>();
-    private final Set<Vertex> vertices = adjacencyMap.keySet();
+    private final Map<V, Set<V>> adjacencyMap = new HashMap<>();
+    private final Set<V> vertices = adjacencyMap.keySet();
 
-    public static Graph newDirectedGraph() {
-        return new Graph(true);
+    public static <V> Graph<V> newDirectedGraph() {
+        return new Graph<>(true);
     }
 
-    public static Graph newUndirectedGraph() {
-        return new Graph(false);
+    public static <V> Graph<V> newUndirectedGraph() {
+        return new Graph<>(false);
     }
 
     private Graph(boolean isDirected) {
         this.isDirected = isDirected;
     }
 
-    public void addVertex(Vertex v) {
+    public void addVertex(V v) {
         Objects.requireNonNull(v);
         if (vertices.contains(v)) {
             // t0d0 proof-read exception messages
@@ -76,7 +76,7 @@ public class Graph {
         adjacencyMap.put(v, new HashSet<>());
     }
 
-    public void addEdge(Vertex v1, Vertex v2) {
+    public void addEdge(V v1, V v2) {
         Objects.requireNonNull(v1);
         Objects.requireNonNull(v2);
         if (v1.equals(v2)) {
@@ -88,7 +88,7 @@ public class Graph {
         if (!vertices.contains(v2)) {
             throw new IllegalArgumentException("One of edge vertices does not belong to graph: " + v2);
         }
-        Set<Vertex> adjs = adjacencyMap.get(v1);
+        Set<V> adjs = adjacencyMap.get(v1);
         if (!adjs.add(v2)) {
             throw new IllegalArgumentException("Edge is already in graph: " + v1 + " -> " + v2);
         }
@@ -98,7 +98,7 @@ public class Graph {
     }
 
     // t0d0 consider something custom instead of standard Java Optional
-    public Optional<List<Edge>> getPath(Vertex from, Vertex to) {
+    public Optional<List<Edge<V>>> getPath(V from, V to) {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
         if (!vertices.contains(from)) {
@@ -112,25 +112,25 @@ public class Graph {
             return Optional.of(Collections.emptyList());
         }
         // t0d0 Analyze complexity
-        LinkedList<Edge> path = new LinkedList<>();
-        Set<Vertex> visitedVertices = new HashSet<>();
+        LinkedList<Edge<V>> path = new LinkedList<>();
+        Set<V> visitedVertices = new HashSet<>();
         if (advancePath(from, to, path, visitedVertices)) {
             return Optional.of(path);
         }
         return Optional.empty();
     }
 
-    private boolean advancePath(Vertex from, Vertex to, LinkedList<Edge> path, Set<Vertex> visitedVertices) {
+    private boolean advancePath(V from, V to, LinkedList<Edge<V>> path, Set<V> visitedVertices) {
         visitedVertices.add(from);
 
-        Set<Vertex> adjs = adjacencyMap.get(from);
+        Set<V> adjs = adjacencyMap.get(from);
         if (adjs.contains(to)) {
-            path.addLast(new EdgeImpl(from, to));
+            path.addLast(new EdgeImpl<>(from, to));
             return true;
         }
         // advance further
-        for (Vertex v : adjs) {
-            path.addLast(new EdgeImpl(from, v));
+        for (V v : adjs) {
+            path.addLast(new EdgeImpl<>(from, v));
             if (!visitedVertices.contains(v) && advancePath(v, to, path, visitedVertices)) {
                 return true;
             }

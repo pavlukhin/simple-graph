@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class GraphPathTest {
+class GraphPathTest {
     @Test
     void nullVertexPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
 
         assertThrows(NullPointerException.class, () -> g.getPath(null, new Vertex()));
         assertThrows(NullPointerException.class, () -> g.getPath(new Vertex(), null));
@@ -20,7 +20,7 @@ public class GraphPathTest {
 
     @Test
     void alienVertexPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
@@ -30,24 +30,24 @@ public class GraphPathTest {
 
     @Test
     void disjointVerticesPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);
         g.addVertex(v2);
 
-        Optional<List<Graph.Edge>> opath = g.getPath(v1, v2);
+        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
 
         assertFalse(opath.isPresent());
     }
 
     @Test
     void identityPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v = new Vertex();
         g.addVertex(v);
 
-        Optional<List<Graph.Edge>> opath = g.getPath(v, v);
+        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v, v);
 
         assertTrue(opath.isPresent());
         assertTrue(opath.get().isEmpty());
@@ -55,17 +55,17 @@ public class GraphPathTest {
 
     @Test
     void oneEdgeDirectedPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);
         g.addVertex(v2);
         g.addEdge(v1, v2);
 
-        Optional<List<Graph.Edge>> opath = g.getPath(v1, v2);
+        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
         assertTrue(opath.isPresent());
         assertEquals(1, opath.get().size());
-        Graph.Edge edge = opath.get().get(0);
+        Graph.Edge<?> edge = opath.get().get(0);
         assertEquals(v1, edge.from());
         assertEquals(v2, edge.to());
 
@@ -74,7 +74,7 @@ public class GraphPathTest {
 
     @Test
     void oneEdgeUndirectedPath() {
-        Graph g = Graph.newUndirectedGraph();
+        Graph<Vertex> g = Graph.newUndirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         g.addVertex(v1);
@@ -82,19 +82,19 @@ public class GraphPathTest {
         g.addEdge(v1, v2);
 
         {
-            Optional<List<Graph.Edge>> opath = g.getPath(v1, v2);
+            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
             assertTrue(opath.isPresent());
             assertEquals(1, opath.get().size());
-            Graph.Edge edge = opath.get().get(0);
+            Graph.Edge<?> edge = opath.get().get(0);
             assertEquals(v1, edge.from());
             assertEquals(v2, edge.to());
         }
 
         {
-            Optional<List<Graph.Edge>> opath = g.getPath(v2, v1);
+            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v2, v1);
             assertTrue(opath.isPresent());
             assertEquals(1, opath.get().size());
-            Graph.Edge edge = opath.get().get(0);
+            Graph.Edge<?> edge = opath.get().get(0);
             assertEquals(v2, edge.from());
             assertEquals(v1, edge.to());
         }
@@ -102,7 +102,7 @@ public class GraphPathTest {
 
     @Test
     void twoEdgeDirectedPath() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         Vertex v3 = new Vertex();
@@ -112,12 +112,12 @@ public class GraphPathTest {
         g.addEdge(v1, v2);
         g.addEdge(v2, v3);
 
-        Optional<List<Graph.Edge>> opath = g.getPath(v1, v3);
+        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v3);
         assertTrue(opath.isPresent());
-        List<Graph.Edge> path = opath.get();
+        List<Graph.Edge<Vertex>> path = opath.get();
         assertEquals(2, path.size());
-        Graph.Edge e0 = path.get(0);
-        Graph.Edge e1 = path.get(1);
+        Graph.Edge<?> e0 = path.get(0);
+        Graph.Edge<?> e1 = path.get(1);
         assertEquals(v1, e0.from());
         assertEquals(v2, e0.to());
         assertEquals(v2, e1.from());
@@ -128,7 +128,7 @@ public class GraphPathTest {
 
     @Test
     void twoEdgeUndirectedPath() {
-        Graph g = Graph.newUndirectedGraph();
+        Graph<Vertex> g = Graph.newUndirectedGraph();
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
         Vertex v3 = new Vertex();
@@ -139,12 +139,12 @@ public class GraphPathTest {
         g.addEdge(v3, v2);
 
         {
-            Optional<List<Graph.Edge>> opath = g.getPath(v1, v3);
+            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v3);
             assertTrue(opath.isPresent());
-            List<Graph.Edge> path = opath.get();
+            List<Graph.Edge<Vertex>> path = opath.get();
             assertEquals(2, path.size());
-            Graph.Edge e0 = path.get(0);
-            Graph.Edge e1 = path.get(1);
+            Graph.Edge<?> e0 = path.get(0);
+            Graph.Edge<?> e1 = path.get(1);
             assertEquals(v1, e0.from());
             assertEquals(v2, e0.to());
             assertEquals(v2, e1.from());
@@ -152,12 +152,12 @@ public class GraphPathTest {
         }
 
         {
-            Optional<List<Graph.Edge>> opath = g.getPath(v3, v1);
+            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v3, v1);
             assertTrue(opath.isPresent());
-            List<Graph.Edge> path = opath.get();
+            List<Graph.Edge<Vertex>> path = opath.get();
             assertEquals(2, path.size());
-            Graph.Edge e0 = path.get(0);
-            Graph.Edge e1 = path.get(1);
+            Graph.Edge<?> e0 = path.get(0);
+            Graph.Edge<?> e1 = path.get(1);
             assertEquals(v3, e0.from());
             assertEquals(v2, e0.to());
             assertEquals(v2, e1.from());
@@ -167,7 +167,7 @@ public class GraphPathTest {
 
     @Test
     void noPathAndCycle() {
-        Graph g = Graph.newDirectedGraph();
+        Graph<Vertex> g = Graph.newDirectedGraph();
 
         Vertex v1 = new Vertex();
         Vertex v2 = new Vertex();
