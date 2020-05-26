@@ -13,8 +13,7 @@ class GraphUserVertexTest {
         g.addVertex("b");
         g.addEdge("a", "b");
 
-        //noinspection OptionalGetWithoutIsPresent
-        List<Graph.Edge<String>> path = g.getPath("a", "b").get();
+        List<Graph.Edge<String>> path = g.getPath("a", "b").edges();
 
         assertEquals(1, path.size());
         assertEquals("a", path.get(0).from());

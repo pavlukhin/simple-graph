@@ -1,7 +1,6 @@
 package org.ivan.examples.graph;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,9 +35,9 @@ class GraphPathTest {
         g.addVertex(v1);
         g.addVertex(v2);
 
-        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
+        Graph.Path<Vertex> path = g.getPath(v1, v2);
 
-        assertFalse(opath.isPresent());
+        assertFalse(path.exists());
     }
 
     @Test
@@ -47,10 +46,10 @@ class GraphPathTest {
         Vertex v = new Vertex();
         g.addVertex(v);
 
-        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v, v);
+        Graph.Path<Vertex> path = g.getPath(v, v);
 
-        assertTrue(opath.isPresent());
-        assertTrue(opath.get().isEmpty());
+        assertTrue(path.exists());
+        assertTrue(path.edges().isEmpty());
     }
 
     @Test
@@ -62,14 +61,14 @@ class GraphPathTest {
         g.addVertex(v2);
         g.addEdge(v1, v2);
 
-        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
-        assertTrue(opath.isPresent());
-        assertEquals(1, opath.get().size());
-        Graph.Edge<?> edge = opath.get().get(0);
+        Graph.Path<Vertex> path = g.getPath(v1, v2);
+        assertTrue(path.exists());
+        assertEquals(1, path.edges().size());
+        Graph.Edge<?> edge = path.edges().get(0);
         assertEquals(v1, edge.from());
         assertEquals(v2, edge.to());
 
-        assertFalse(g.getPath(v2, v1).isPresent());
+        assertFalse(g.getPath(v2, v1).exists());
     }
 
     @Test
@@ -82,19 +81,19 @@ class GraphPathTest {
         g.addEdge(v1, v2);
 
         {
-            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v2);
-            assertTrue(opath.isPresent());
-            assertEquals(1, opath.get().size());
-            Graph.Edge<?> edge = opath.get().get(0);
+            Graph.Path<Vertex> path = g.getPath(v1, v2);
+            assertTrue(path.exists());
+            assertEquals(1, path.edges().size());
+            Graph.Edge<?> edge = path.edges().get(0);
             assertEquals(v1, edge.from());
             assertEquals(v2, edge.to());
         }
 
         {
-            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v2, v1);
-            assertTrue(opath.isPresent());
-            assertEquals(1, opath.get().size());
-            Graph.Edge<?> edge = opath.get().get(0);
+            Graph.Path<Vertex> path = g.getPath(v2, v1);
+            assertTrue(path.exists());
+            assertEquals(1, path.edges().size());
+            Graph.Edge<?> edge = path.edges().get(0);
             assertEquals(v2, edge.from());
             assertEquals(v1, edge.to());
         }
@@ -112,18 +111,18 @@ class GraphPathTest {
         g.addEdge(v1, v2);
         g.addEdge(v2, v3);
 
-        Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v3);
-        assertTrue(opath.isPresent());
-        List<Graph.Edge<Vertex>> path = opath.get();
-        assertEquals(2, path.size());
-        Graph.Edge<?> e0 = path.get(0);
-        Graph.Edge<?> e1 = path.get(1);
+        Graph.Path<Vertex> path = g.getPath(v1, v3);
+        assertTrue(path.exists());
+        List<Graph.Edge<Vertex>> edges = path.edges();
+        assertEquals(2, edges.size());
+        Graph.Edge<?> e0 = edges.get(0);
+        Graph.Edge<?> e1 = edges.get(1);
         assertEquals(v1, e0.from());
         assertEquals(v2, e0.to());
         assertEquals(v2, e1.from());
         assertEquals(v3, e1.to());
 
-        assertFalse(g.getPath(v3, v1).isPresent());
+        assertFalse(g.getPath(v3, v1).exists());
     }
 
     @Test
@@ -139,12 +138,12 @@ class GraphPathTest {
         g.addEdge(v3, v2);
 
         {
-            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v1, v3);
-            assertTrue(opath.isPresent());
-            List<Graph.Edge<Vertex>> path = opath.get();
-            assertEquals(2, path.size());
-            Graph.Edge<?> e0 = path.get(0);
-            Graph.Edge<?> e1 = path.get(1);
+            Graph.Path<Vertex> path = g.getPath(v1, v3);
+            assertTrue(path.exists());
+            List<Graph.Edge<Vertex>> edges = path.edges();
+            assertEquals(2, edges.size());
+            Graph.Edge<?> e0 = edges.get(0);
+            Graph.Edge<?> e1 = edges.get(1);
             assertEquals(v1, e0.from());
             assertEquals(v2, e0.to());
             assertEquals(v2, e1.from());
@@ -152,12 +151,12 @@ class GraphPathTest {
         }
 
         {
-            Optional<List<Graph.Edge<Vertex>>> opath = g.getPath(v3, v1);
-            assertTrue(opath.isPresent());
-            List<Graph.Edge<Vertex>> path = opath.get();
-            assertEquals(2, path.size());
-            Graph.Edge<?> e0 = path.get(0);
-            Graph.Edge<?> e1 = path.get(1);
+            Graph.Path<Vertex> path = g.getPath(v3, v1);
+            assertTrue(path.exists());
+            List<Graph.Edge<Vertex>> edges = path.edges();
+            assertEquals(2, edges.size());
+            Graph.Edge<?> e0 = edges.get(0);
+            Graph.Edge<?> e1 = edges.get(1);
             assertEquals(v3, e0.from());
             assertEquals(v2, e0.to());
             assertEquals(v2, e1.from());
@@ -182,6 +181,6 @@ class GraphPathTest {
         g.addEdge(v3, v4);
         g.addEdge(v4, v3);
 
-        assertFalse(g.getPath(v1, v3).isPresent());
+        assertFalse(g.getPath(v1, v3).exists());
     }
 }

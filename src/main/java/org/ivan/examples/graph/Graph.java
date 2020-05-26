@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -29,6 +28,20 @@ public final class Graph<V> {
         V to();
     }
 
+    public interface Path<V> {
+        /**
+         * @return {@code true} if the requested path exists
+         */
+        boolean exists();
+
+        /**
+         * Returns edges of the existing path (in terms of {@link #exists()}).
+         * It is illegal to call this method when the path does not exist.
+         * @return list of existing path edges
+         */
+        List<Edge<V>> edges();
+    }
+
     private static class EdgeImpl<V> implements Edge<V> {
         private final V from;
         private final V to;
@@ -38,29 +51,35 @@ public final class Graph<V> {
             this.to = Objects.requireNonNull(to);
         }
 
-        @Override public V from() {
+        @Override
+        public V from() {
             return from;
         }
 
-        @Override public V to() {
+        @Override
+        public V to() {
             return to;
         }
+    }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            @SuppressWarnings("rawtypes")
-            EdgeImpl edge = (EdgeImpl)o;
-            return Objects.equals(from, edge.from) &&
-                Objects.equals(to, edge.to);
+    private static class PathImpl<V> implements Path<V> {
+        private final List<Edge<V>> edges;
+
+        private PathImpl(List<Edge<V>> edges) {
+            this.edges = edges;
         }
 
         @Override
-        public int hashCode() {
-            return Objects.hash(from, to);
+        public boolean exists() {
+            return edges != null;
+        }
+
+        @Override
+        public List<Edge<V>> edges() {
+            if (!exists()) {
+                throw new IllegalStateException("This path does not exist.");
+            }
+            return edges;
         }
     }
 
@@ -137,7 +156,6 @@ public final class Graph<V> {
         }
     }
 
-    // t0d0 consider something custom instead of standard Java Optional
     /**
      * Searches a path between 2 vertices in the graph.
      * <ul>
@@ -145,10 +163,9 @@ public final class Graph<V> {
      * </ul>
      * @param from a path start vertex ({@code null} is prohibited)
      * @param to a path end vertex ({@code null} is prohibited)
-     * @return An optional list of edges. An empty optional means there is no path between passed vertices.
-     * An empty list of edges means that both vertices are equal.
+     * @return A path (possibly not existing). An empty list of edges means that both vertices are equal.
      */
-    public Optional<List<Edge<V>>> getPath(V from, V to) {
+    public Path<V> getPath(V from, V to) {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
         if (!vertices.contains(from)) {
@@ -159,15 +176,15 @@ public final class Graph<V> {
         }
 
         if (from.equals(to)) {
-            return Optional.of(Collections.emptyList());
+            return new PathImpl<>(Collections.emptyList());
         }
         // t0d0 Analyze complexity
         LinkedList<Edge<V>> path = new LinkedList<>();
         Set<V> visitedVertices = new HashSet<>();
         if (advancePath(from, to, path, visitedVertices)) {
-            return Optional.of(path);
+            return new PathImpl<>(path);
         }
-        return Optional.empty();
+        return new PathImpl<>(null);
     }
 
     private boolean advancePath(V from, V to, LinkedList<Edge<V>> path, Set<V> visitedVertices) {
