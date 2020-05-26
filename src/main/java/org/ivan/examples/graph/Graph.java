@@ -10,7 +10,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-public class Graph<V> {
+/**
+ * Represents a graph (vertices and edges connecting pairs of vertices).<p>
+ *
+ * A graph can be configured as either directed or undirected upon creation.<p>
+ *
+ * This class is parameterized with a vertex type.
+ * Internally methods {@link Object#equals} and {@link Object#hashCode()} are used for determining vertex equality
+ * (default implementations inherited from {@link Object} will work fine).<p>
+ *
+ * API is designed in a <i>strict</i> fashion in order to prevent programming errors early.
+ * {@code null} vertices are prohibited.
+ * @param <V> a vertex type
+ */
+public final class Graph<V> {
     public interface Edge<V> {
         V from();
         V to();
@@ -55,18 +68,36 @@ public class Graph<V> {
     private final Map<V, Set<V>> adjacencyMap = new HashMap<>();
     private final Set<V> vertices = adjacencyMap.keySet();
 
+    /**
+     * Creates a directed graph.
+     * @param <V> a vertex type.
+     * @return new directed graph.
+     */
     public static <V> Graph<V> newDirectedGraph() {
         return new Graph<>(true);
     }
 
+    /**
+     * Creates an undirected graph.
+     * @param <V> a vertex type.
+     * @return new undirected graph.
+     */
     public static <V> Graph<V> newUndirectedGraph() {
         return new Graph<>(false);
     }
 
+    // private to prevent direct usage, static factory methods are supposed to be used
     private Graph(boolean isDirected) {
         this.isDirected = isDirected;
     }
 
+    /**
+     * Adds a vertex to the graph.
+     * <ul>
+     *     <li>It is illegal to add a vertex which is already in the graph.</li>
+     * </ul>
+     * @param v a vertex to add ({@code null} is prohibited)
+     */
     public void addVertex(V v) {
         Objects.requireNonNull(v);
         if (vertices.contains(v)) {
@@ -75,28 +106,48 @@ public class Graph<V> {
         adjacencyMap.put(v, new HashSet<>());
     }
 
-    public void addEdge(V v1, V v2) {
-        Objects.requireNonNull(v1);
-        Objects.requireNonNull(v2);
-        if (v1.equals(v2)) {
-            throw new IllegalArgumentException("Identity edges are not permitted: " + v1 + " -> " + v2);
+    /**
+     * Adds an edge to the graph.
+     * <ul>
+     *     <li>It is required that both edge vertices was already added to the graph.</li>
+     *     <li>Identity edges (start and end vertices are equal) are treated invalid.</li>
+     *     <li>It is illegal to add an edge which is already in the graph.</li>
+     * </ul>
+     * @param from an edge start vertex ({@code null} is prohibited)
+     * @param to an edge end vertex ({@code null} is prohibited)
+     */
+    public void addEdge(V from, V to) {
+        Objects.requireNonNull(from);
+        Objects.requireNonNull(to);
+        if (from.equals(to)) {
+            throw new IllegalArgumentException("Identity edges are not permitted: " + from + " -> " + to);
         }
-        if (!vertices.contains(v1)) {
-            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + v1);
+        if (!vertices.contains(from)) {
+            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + from);
         }
-        if (!vertices.contains(v2)) {
-            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + v2);
+        if (!vertices.contains(to)) {
+            throw new IllegalArgumentException("One of edge vertices does not belong to the graph: " + to);
         }
-        Set<V> adjs = adjacencyMap.get(v1);
-        if (!adjs.add(v2)) {
-            throw new IllegalArgumentException("An edge is already in the graph: " + v1 + " -> " + v2);
+        Set<V> adjs = adjacencyMap.get(from);
+        if (!adjs.add(to)) {
+            throw new IllegalArgumentException("An edge is already in the graph: " + from + " -> " + to);
         }
         if (!isDirected) {
-            adjacencyMap.get(v2).add(v1);
+            adjacencyMap.get(to).add(from);
         }
     }
 
     // t0d0 consider something custom instead of standard Java Optional
+    /**
+     * Searches a path between 2 vertices in the graph.
+     * <ul>
+     *     <li>It is required that both vertices was already added to the graph.</li>
+     * </ul>
+     * @param from a path start vertex ({@code null} is prohibited)
+     * @param to a path end vertex ({@code null} is prohibited)
+     * @return An optional list of edges. An empty optional means there is no path between passed vertices.
+     * An empty list of edges means that both vertices are equal.
+     */
     public Optional<List<Edge<V>>> getPath(V from, V to) {
         Objects.requireNonNull(from);
         Objects.requireNonNull(to);
