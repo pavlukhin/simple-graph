@@ -38,6 +38,7 @@ class GraphPathTest {
         Graph.Path<Vertex> path = g.getPath(v1, v2);
 
         assertFalse(path.exists());
+        assertThrows(IllegalStateException.class, path::edges);
     }
 
     @Test
